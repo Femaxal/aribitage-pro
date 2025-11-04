@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Ledger - Arbitrage Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="logo">
+      <h2>Arbitrage Pro</h2>
+    </div>
+    <nav>
+      <a href="index.html">🏠 Home</a>
+      <a href="accounts.html">👤 Accounts</a>
+      <a href="ledger.html" class="active">📘 Ledger</a>
+      <a href="trade-history.html">📊 Trade History</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard">
+    <header class="header-bar">
+      <h1>📘 Cumulative Platform Ledger</h1>
+      <div class="rate-summary">
+        <p><strong>Buy Rate:</strong> ₦<span id="buyRateDisplay">1500</span></p>
+        <p><strong>Sell Rate:</strong> ₦<span id="sellRateDisplay">1650</span></p>
+      </div>
+    </header>
+
+    <section class="ledger-section">
+      <h2>All Accounts Transaction Ledger</h2>
+      <p>Below is the detailed record of all buy and sell transactions made across every account on the platform.</p>
+
+      <div class="ledger-table-container">
+        <table class="ledger-table" id="ledgerTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Account</th>
+              <th>Type</th>
+              <th>USD</th>
+              <th>₦ Rate</th>
+              <th>NGN Value</th>
+              <th>Discount</th>
+              <th>Profit ($)</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      populateLedgerTable();
+      startRateSimulation(); // continue live updates
+    });
+  </script>
+</body>
+</html>

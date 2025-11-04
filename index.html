@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arbitrage Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="logo">
+      <h2>Arbitrage Pro</h2>
+    </div>
+    <nav>
+      <a href="index.html" class="active">🏠 Home</a>
+      <a href="accounts.html">👤 Accounts</a>
+      <a href="ledger.html">📘 Ledger</a>
+      <a href="trade-history.html">📊 Trade History</a>
+    </nav>
+  </aside>
+
+  <!-- Main Dashboard -->
+  <main class="dashboard">
+    <header class="header-bar">
+      <h1>📈 Real-Time Market Dashboard</h1>
+      <div class="rate-summary">
+        <p><strong>Buy Rate:</strong> ₦<span id="buyRateDisplay">1500</span></p>
+        <p><strong>Sell Rate:</strong> ₦<span id="sellRateDisplay">1650</span></p>
+        <p><strong>Profit Margin:</strong> <span id="profitMarginDisplay">10</span>%</p>
+
+        <!-- Added: Live Data Source & Timestamp -->
+        <div id="rateSourceInfo" class="rate-info" style="margin-top:6px; font-size:0.9em; color:#7f8c8d; text-align:center;">
+          💹 Loading live USD/NGN data...
+        </div>
+      </div>
+
+      <button class="btn btn-info" onclick="openModal('multiTradeModal')">⚡ Trade Multiple Accounts</button>
+
+    </header>
+
+    <section class="chart-section" style="height: 500px; max-height:60vh;">
+      <h2>📈 Live Market Rate (NGN / USD)</h2>
+      <div style="position: relative; height: 350px;">
+        <canvas id="marketChart"></canvas>
+      </div>
+    </section>
+
+    <section class="summary-section">
+      <div class="summary">
+        <p><strong>Total Platform Balance:</strong> ₦<span id="totalPlatformBalance">0</span></p>
+        <p><strong>Total Platform Profit:</strong> ₦<span id="totalPlatformProfit">0</span></p>
+      </div>
+
+    </section>
+
+    <!-- Multi-Account Trade Modal -->
+    <div class="modal" id="multiTradeModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('multiTradeModal')">&times;</span>
+        <h2>⚙️ Multi-Account Trade</h2>
+
+        <div class="trade-type-toggle">
+          <label><input type="radio" name="tradeType" value="buy" checked> Buy</label>
+          <label><input type="radio" name="tradeType" value="sell"> Sell</label>
+        </div>
+
+        <div class="account-choice">
+          <p><strong>Choose Accounts:</strong></p>
+          <select id="accountSelectionMode" onchange="toggleAccountSelectionList()">
+            <option value="all">All Accounts</option>
+            <option value="specific">Specific Accounts</option>
+          </select>
+        </div>
+
+        <!-- Dynamic checkbox list for specific account selection -->
+        <div id="specificAccountsList" class="specific-accounts hidden"></div>
+
+        <div class="trade-amount">
+          <label><strong>Amount (USD):</strong></label>
+          <input type="number" id="multiTradeAmount" placeholder="Enter amount" min="0.01" step="0.01">
+        </div>
+
+        <div style="margin-top: 15px;">
+          <button class="btn btn-success" onclick="confirmMultiTrade()">✅ Execute Trade</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="chart.js"></script>
+  <script src="script.js"></script>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    startRateSimulation();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts - Arbitrage Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="logo">
+      <h2>Arbitrage Pro</h2>
+    </div>
+    <nav>
+      <a href="index.html">🏠 Home</a>
+      <a href="accounts.html" class="active">👤 Accounts</a>
+      <a href="ledger.html">📘 Ledger</a>
+      <a href="trade-history.html">📊 Trade History</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard">
+    <div class="container">
+      <div class="header">
+        <h1>🚀 Arbitrage Trading Platform</h1>
+        <p>Complete USD/NGN Trading System with Real Bank Integration</p>
+      </div>
+
+      <div class="trading-controls">
+        <div class="rate-display">
+          <div class="rate-item">
+            <strong>Buy Rate: ₦<span id="buyRateDisplay">1500</span>/USD</strong>
+          </div>
+          <div class="rate-item">
+            <strong>Sell Rate: ₦<span id="sellRateDisplay">1650</span>/USD</strong>
+          </div>
+          <div class="rate-item" style="color: #27ae60;">
+            <strong>Profit: <span id="profitMarginDisplay">10</span>% per cycle</strong>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="resetAllAccounts()">🔄 Reset All Accounts</button>
+        <button class="btn btn-info" onclick="exportData()">📊 Export Data</button>
+      </div>
+
+      <!-- Custom Account Selector -->
+      <div class="account-selector">
+        <div class="dropdown">
+          <button class="dropdown-toggle btn btn-info" onclick="toggleAccountDropdown()">
+            👤 Accounts <span id="selectedAccountName">Account 1</span> ▼
+          </button>
+          <div class="dropdown-menu" id="accountDropdownMenu">
+            <div class="dropdown-search">
+              <input 
+                type="text" 
+                id="accountSearchInput" 
+                placeholder="Search account..." 
+                onkeyup="filterAccountDropdown()"
+              />
+            </div>
+            <div id="accountListContainer"></div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn btn-info" onclick="showPrevAccount()">⬅️ Prev</button>
+          <button class="btn btn-info" onclick="showNextAccount()">Next ➡️</button>
+        </div>
+      </div>
+
+      <div class="portfolio-chart-container">
+        <h3 style="margin-top: 0; color: #2c3e50; text-align: center;">📈 Portfolio Overview</h3>
+        <canvas id="portfolioChart"></canvas>
+      </div>
+
+      <div class="summary-bar" id="summaryBar"></div>
+      <div class="accounts-grid" id="accountsGrid"></div>
+    </div>
+
+    <!-- Buy Modal -->
+    <div class="modal" id="buyModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('buyModal')">&times;</span>
+        <h2>🏦 Buy USD - Bank Transfer</h2>
+        <div class="bank-details">
+          <p><strong>Bank:</strong> Paystack Nigeria</p>
+          <p><strong>Account Name:</strong> One-Time Trade Payment</p>
+          <p><strong>Account Number:</strong> <span id="paystackAccountNumber">2089547361</span></p>
+          <p><strong>Live Buy Rate:</strong> ₦<span id="liveBuyRateDisplay">1500</span> per USD</p>
+        </div>
+        <label><strong>Amount to Buy (USD):</strong></label>
+        <input type="number" id="buyAmountInput" placeholder="Enter USD amount" min="0.01" step="0.01">
+        <div style="margin: 15px 0; font-size: 1.1em;">
+          <strong>Total NGN Required: ₦<span id="ngnRequired">0</span></strong>
+        </div>
+        <button class="btn btn-success" onclick="confirmBuy()">✅ Confirm Bank Transfer</button>
+      </div>
+    </div>
+
+    <!-- Sell Modal -->
+    <div class="modal" id="sellModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('sellModal')">&times;</span>
+        <h2>💰 Sell USD - Crypto Wallet</h2>
+        <div class="wallet-section">
+          <label><strong>Amount to Sell (USD):</strong></label>
+          <input 
+            type="number" 
+            id="sellAmountInput" 
+            placeholder="Enter USD amount" 
+            min="0.01" 
+            step="0.01"
+            oninput="updateSellProfitPreview()"
+          />
+          <p><strong>Select previously used wallet (optional):</strong></p>
+          <select id="savedWalletsDropdown" onchange="fillWalletFromDropdown()">
+            <option value="">Select saved wallet</option>
+          </select>
+          <p style="margin-top: 15px;"><strong>Or enter new Crypto Wallet Address:</strong></p>
+          <input type="text" id="sellWalletInput" placeholder="Enter wallet address">
+          <div class="network-selector">
+            <label><strong>Select Wallet Network:</strong></label>
+            <div class="custom-dropdown" onclick="openNetworkSelector()">
+              <div id="walletNetworkDisplay" class="wallet-network-display">
+                <img id="walletNetworkIcon" src="" alt="" style="display:none;">
+                <span id="walletNetworkName">Select Network</span>
+              </div>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profit-calculation">
+          <p><strong>USD to Sell:</strong> $<span id="usdToSell">0</span></p>
+          <p><strong>NGN to Receive:</strong> ₦<span id="ngnToReceive">0</span></p>
+          <p class="profit-highlight">🎯 <strong>Profit:</strong> $<span id="profitToEarn">0</span></p>
+        </div>
+        
+        <button class="btn btn-success" onclick="confirmSell()">💸 Confirm Crypto Transfer</button>
+      </div>
+    </div>
+
+    <!-- Deposit Modal -->
+<div class="modal" id="depositModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
+    <h2>🏦 Deposit Funds</h2>
+
+    <div class="bank-details">
+      <p><strong>Bank Name:</strong> Opay Digital Services</p>
+      <p><strong>Account Name:</strong> Mannnaman Benjamin Somiari</p>
+      <p><strong>Account Number:</strong> 9064227040</p>
+    </div>
+
+    <label><strong>Deposit Amount (₦):</strong></label>
+    <input type="number" id="depositAmountInput" placeholder="Enter amount" min="100" step="100">
+
+    <div style="margin-top: 15px;">
+      <button class="btn btn-success" onclick="initiateDeposit()">✅ Confirm Deposit</button>
+    </div>
+  </div>
+</div>
+
+<!-- OTP Modal -->
+<div class="modal" id="otpModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('otpModal')">&times;</span>
+    <h2>🔐 Confirm Transaction</h2>
+    <p>Enter the 6-digit OTP sent to your device:</p>
+    <input type="text" id="otpInput" maxlength="6" placeholder="••••••" style="text-align:center; font-size:1.4em; letter-spacing:5px;">
+    <div style="margin-top:15px;">
+      <button class="btn btn-success" onclick="confirmOTP()">✅ Verify OTP</button>
+    </div>
+  </div>
+</div>
+
+    <!-- Withdraw Modal -->
+<div class="modal" id="withdrawModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('withdrawModal')">&times;</span>
+    <h2>🏧 Withdraw Funds (NGN)</h2>
+
+    <div class="bank-details">
+      <p><strong>Bank Name:</strong> Opay Digital Services</p>
+      <p><strong>Account Name:</strong> Mannnaman Benjamin Somiari</p>
+      <p><strong>Account Number:</strong> 9064227040</p>
+    </div>
+
+    <label><strong>Amount (₦):</strong></label>
+    <input type="number" id="withdrawAmountInput" placeholder="Enter amount" min="100" step="100">
+
+    <div style="margin-top: 15px;">
+      <button class="btn btn-danger" onclick="initiateWithdraw()">💸 Confirm Withdrawal</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN Modal -->
+<div class="modal" id="pinModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('pinModal')">&times;</span>
+    <h2>🔢 Enter Transaction PIN</h2>
+    <p>Enter your 4-digit PIN to confirm this withdrawal:</p>
+
+    <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+      <input type="password" id="pinInput" maxlength="4" placeholder="••••" 
+             style="text-align:center;font-size:1.5em;width:100px;letter-spacing:5px;">
+      <button class="btn btn-info" onclick="togglePinVisibility()">👁️</button>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <button class="btn btn-success" onclick="confirmPIN()">✅ Verify PIN</button>
+    </div>
+  </div>
+</div>
+
+    
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        startRateSimulation(); // ensures the live fetch runs and updates buy/sell rates
+      });
+    </script>
+
+  </main>
+  <!-- Network Selector Modal -->
+  <div id="networkSelectorModal" class="network-selector-modal">
+    <div class="network-selector-content">
+      <h3>Choose a Chain Type</h3>
+      <p class="info-text">Make sure the chain type you deposit with matches your withdrawal network.</p>
+      <div class="network-list">
+        <div class="network-item" onclick="selectNetwork('Ethereum (ERC20)')">
+          <img src="Network Images/ethereum-eth-logo.svg" alt=""> Ethereum (ERC20)
+        </div>
+        <div class="network-item" onclick="selectNetwork('TRON (TRC20)')">
+          <img src="Network Images/tron-trx-logo.svg" alt=""> TRON (TRC20)
+        </div>
+        <div class="network-item" onclick="selectNetwork('Arbitrum One')">
+          <img src="Network Images/arbitrum-arb-logo.svg" alt=""> Arbitrum One
+        </div>
+        <div class="network-item" onclick="selectNetwork('SOL')">
+          <img src="Network Images/solana-sol-logo.svg" alt=""> SOL
+        </div>
+        <div class="network-item" onclick="selectNetwork('BSC (BEP20)')">
+          <img src="Network Images/bnb-bnb-logo.svg" alt=""> BSC (BEP20)
+        </div>
+        <div class="network-item" onclick="selectNetwork('Polygon PoS')">
+          <img src="Network Images/polygon-matic-logo.svg" alt=""> Polygon PoS
+        </div>
+        <div class="network-item" onclick="selectNetwork('OP Mainnet')">
+          <img src="Network Images/optimism-ethereum-op-logo.svg" alt=""> OP Mainnet
+        </div>
+        <div class="network-item" onclick="selectNetwork('AVAXC')">
+          <img src="Network Images/avalanche-avax-logo.svg" alt=""> AVAXC
+        </div>
+      </div>
+      <button class="btn btn-secondary" onclick="closeNetworkSelector()">Close</button>
+    </div>
+  </div>
+
+</body>
+</html>
