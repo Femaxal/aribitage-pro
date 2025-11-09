@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication - Arbitrage Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .auth-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      width: 350px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .auth-card h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    .auth-card input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    .auth-card button {
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 15px;
+      width: 100%;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .auth-card button:hover {
+      background: #2980b9;
+    }
+
+    .auth-toggle {
+      margin-top: 15px;
+      color: #3498db;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-card" id="authCard">
+    <h2 id="authTitle">Sign In</h2>
+
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="handleAuth()">Sign In</button>
+
+    <p class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? Sign Up</p>
+  </div>
+
+  <script>
+    let isSignUp = false;
+
+    function toggleAuthMode() {
+      const title = document.getElementById("authTitle");
+      const button = document.querySelector(".auth-card button");
+      const toggle = document.querySelector(".auth-toggle");
+
+      isSignUp = !isSignUp;
+
+      if (isSignUp) {
+        title.textContent = "Create Account";
+        button.textContent = "Sign Up";
+        toggle.textContent = "Already have an account? Sign In";
+      } else {
+        title.textContent = "Sign In";
+        button.textContent = "Sign In";
+        toggle.textContent = "Don't have an account? Sign Up";
+      }
+    }
+
+    function handleAuth() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!username || !password) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      if (isSignUp) {
+        if (localStorage.getItem(username)) {
+          alert("Username already exists!");
+          return;
+        }
+        localStorage.setItem(username, JSON.stringify({ password }));
+        alert("✅ Account created successfully! Please sign in.");
+        toggleAuthMode();
+      } else {
+        const stored = JSON.parse(localStorage.getItem(username));
+        if (!stored || stored.password !== password) {
+          alert("Invalid username or password.");
+          return;
+        }
+        alert(`Welcome back, ${username}!`);
+        localStorage.setItem("activeUser", username); // ✅ store current session
+        localStorage.setItem("lastActivity", Date.now());
+        window.location.href = "index.html";
+      }
+    }
+  </script>
+</body>
+</html>

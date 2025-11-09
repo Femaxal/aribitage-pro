@@ -26,6 +26,7 @@
   <!-- Main Dashboard -->
   <main class="dashboard">
     <header class="header-bar">
+      <p id="welcomeUser" class="welcome-text"></p>
       <h1>📈 Real-Time Market Dashboard</h1>
       <div class="rate-summary">
         <p><strong>Buy Rate:</strong> ₦<span id="buyRateDisplay">1500</span></p>
@@ -37,9 +38,10 @@
           💹 Loading live USD/NGN data...
         </div>
       </div>
-
-      <button class="btn btn-info" onclick="openModal('multiTradeModal')">⚡ Trade Multiple Accounts</button>
-
+      <div class="header-buttons">
+        <button class="btn btn-info" onclick="openModal('multiTradeModal')">⚡ Trade Multiple Accounts</button>
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
+      </div>
     </header>
 
     <section class="chart-section" style="height: 500px; max-height:60vh;">

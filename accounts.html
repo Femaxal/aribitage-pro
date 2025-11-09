@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accounts - Arbitrage Pro</title>
   <link rel="stylesheet" href="style.css">
-  <script src="script.js"></script>
 </head>
 <body>
   <!-- Sidebar Navigation -->
@@ -27,7 +26,9 @@
     <div class="container">
       <div class="header">
         <h1>🚀 Arbitrage Trading Platform</h1>
+        <p id="welcomeUser" class="welcome-text"></p>
         <p>Complete USD/NGN Trading System with Real Bank Integration</p>
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
       </div>
 
       <div class="trading-controls">
@@ -261,5 +262,6 @@
     </div>
   </div>
 
+  <script src="script.js"></script>
 </body>
 </html>

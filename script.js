@@ -7,6 +7,38 @@ const MAX_BUY = 1550;
 const MIN_SELL = 1600;
 const MAX_SELL = 1700;*/
 
+// === SESSION TIMEOUT SETTINGS ===
+const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
+const WARNING_TIME = 5 * 60 * 1000; // show warning at 10 minutes (5 min before logout)
+let lastActivityTime = Date.now();
+let warningShown = false;
+
+// --- Authentication Guard (Redirect if not logged in) ---
+document.addEventListener("DOMContentLoaded", () => {
+  const isAuthPage = window.location.pathname.endsWith("auth.html");
+  const activeUser = localStorage.getItem("activeUser");
+
+  if (!isAuthPage && !activeUser) {
+    // Not logged in, redirect to auth page
+    window.location.href = "auth.html";
+  }
+
+  // If user is logged in and tries to open auth page, redirect to dashboard
+  if (isAuthPage && activeUser) {
+    window.location.href = "index.html";
+  }
+});
+
+// --- Display Logged-in Username ---
+document.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("activeUser");
+  const nameDisplay = document.getElementById("welcomeUser");
+
+  if (username && nameDisplay) {
+    nameDisplay.textContent = `👋 Welcome, ${username}!`;
+  }
+});
+
 const RATE_UPDATE_INTERVAL = 5000; // every 5 seconds
 
 // Account initialization
@@ -1286,3 +1318,66 @@ function selectNetwork(name) {
 
   closeNetworkSelector();
 }
+
+function logout() {
+  if (confirm("Are you sure you want to log out?")) {
+    localStorage.removeItem("activeUser");
+    window.location.href = "auth.html";
+  }
+}
+console.log("✅ logout() function loaded successfully");
+
+// === AUTO LOGOUT AFTER INACTIVITY WITH WARNING ===
+document.addEventListener("DOMContentLoaded", () => {
+  const activeUser = localStorage.getItem("activeUser");
+  if (!activeUser) return; // only run on protected pages
+
+  // --- Create warning banner dynamically ---
+  const warningBanner = document.createElement("div");
+  warningBanner.id = "sessionWarning";
+  warningBanner.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(231, 76, 60, 0.95);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-size: 0.95em;
+    z-index: 9999;
+    display: none;
+    transition: opacity 0.3s ease;
+  `;
+  document.body.appendChild(warningBanner);
+
+  // --- Activity reset handler ---
+  const resetActivity = () => {
+    lastActivityTime = Date.now();
+    localStorage.setItem("lastActivity", lastActivityTime);
+    warningShown = false;
+    warningBanner.style.display = "none";
+  };
+
+  ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt =>
+    window.addEventListener(evt, resetActivity)
+  );
+
+  // --- Periodically check inactivity ---
+  setInterval(() => {
+    const now = Date.now();
+    const storedActivity = parseInt(localStorage.getItem("lastActivity"), 10) || lastActivityTime;
+    const inactivity = now - storedActivity;
+
+    if (inactivity > SESSION_TIMEOUT) {
+      alert("⚠️ You’ve been logged out due to inactivity.");
+      logout();
+    } 
+    else if (inactivity > SESSION_TIMEOUT - WARNING_TIME && !warningShown) {
+      const minutesLeft = Math.ceil((SESSION_TIMEOUT - inactivity) / 60000);
+      warningBanner.innerHTML = `⏳ You will be logged out in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''} due to inactivity.`;
+      warningBanner.style.display = "block";
+      warningShown = true;
+    }
+  }, 30000); // check every 30s
+});
