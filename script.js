@@ -42,11 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
 const RATE_UPDATE_INTERVAL = 5000; // every 5 seconds
 
 // Account initialization
-// Automatically generate 33 user accounts
+// Automatically generate 44 user accounts
 let accounts = [];
-const INITIAL_BALANCE = 300;
+const INITIAL_BALANCE = 0;
 
-for (let i = 1; i <= 33; i++) {
+for (let i = 1; i <= 44; i++) {
     accounts.push({
         id: i,
         name: `Account ${i}`,
